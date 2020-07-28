@@ -18,7 +18,7 @@ int main(void)
 
     char outputBuffer[BUFFER_SIZE];
     uint32_t bytesWrote;
-    int32_t returnCode, fd;
+    int32_t returnCode, f_name_fifo;
 
     /* Create named fifo. -1 means already exists so no action if already exists */
     if ((returnCode = mknod(FIFO_NAME, S_IFIFO | 0666, 0)) < FIFO_ALREADY_EXIST)
@@ -29,9 +29,9 @@ int main(void)
 
     /* Open named fifo. Blocks until other process opens it */
     printf("waiting for readers...\n");
-    if ((fd = open(FIFO_NAME, O_WRONLY)) < 0)
+    if ((f_name_fifo = open(FIFO_NAME, O_WRONLY)) < 0)
     {
-        printf("Error opening named fifo file: %d\n", fd);
+        printf("Error opening named fifo file: %d\n", f_name_fifo);
         exit(1);
     }
 
@@ -45,7 +45,7 @@ int main(void)
         fgets(outputBuffer, BUFFER_SIZE, stdin);
 
         /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
-        if ((bytesWrote = write(fd, outputBuffer, strlen(outputBuffer) - 1)) == -1)
+        if ((bytesWrote = write(f_name_fifo, outputBuffer, strlen(outputBuffer) - 1)) == -1)
         {
             perror("write");
         }

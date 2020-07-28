@@ -15,6 +15,7 @@
 #define FIFO_ALREADY_EXIST -1
 #define BUFFER_SIZE 300
 #define END_STRING '\0'
+#define INPUT_TYPE_LENGTH 4
 
 int main(void)
 {
@@ -22,6 +23,7 @@ int main(void)
     int32_t bytesRead, returnCode, f_name_fifo;
     FILE *f_data, *f_sign;
     char character;
+    char Input_Type[INPUT_TYPE_LENGTH];
 
     /* Create named fifo. -1 means already exists so no action if already exists */
     if ((returnCode = mknod(FIFO_NAME, S_IFIFO | 0666, 0)) < FIFO_ALREADY_EXIST)
@@ -61,6 +63,16 @@ int main(void)
         {
             inputBuffer[bytesRead] = END_STRING;
             printf("reader: %s\n", inputBuffer);
+            strncpy(Input_Type, inputBuffer, INPUT_TYPE_LENGTH);
+            //printf("reader: %s\n", Input_Type);
+            if (strncmp("DATA", Input_Type, INPUT_TYPE_LENGTH) == 0)
+            {
+                fprintf(f_data, "%s\n", inputBuffer);
+            }
+            if (strncmp("SIGN", Input_Type, INPUT_TYPE_LENGTH) == 0)
+            {
+                fprintf(f_sign, "%s\n", inputBuffer);
+            }
         }
     } while (bytesRead > 0);
 

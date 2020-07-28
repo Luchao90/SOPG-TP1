@@ -12,9 +12,9 @@
 #define FIFO_NAME "NamedFIFO"
 #define FIFO_ALREADY_EXIST -1
 #define BUFFER_SIZE 50
-#define MSG_SIGUSER_1 "SIGN:1\n"
-#define MSG_SIGUSER_2 "SIGN:2\n"
-#define MSG_CRTL_C "CONTROL C\n"
+#define MSG_SIGUSER_1 "SIGN:1"
+#define MSG_SIGUSER_2 "SIGN:2"
+#define MSG_CRTL_C "CONTROL C"
 
 void SigUser_1(int sig);
 void SigUser_2(int sig);

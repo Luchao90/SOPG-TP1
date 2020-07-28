@@ -19,7 +19,7 @@
 int main(void)
 {
     uint8_t inputBuffer[BUFFER_SIZE];
-    int32_t bytesRead, returnCode, fd;
+    int32_t bytesRead, returnCode, f_name_fifo;
     FILE *f_data, *f_sign;
     char character;
 
@@ -43,9 +43,9 @@ int main(void)
 
     /* Open named fifo. Blocks until other process opens it */
     printf("waiting for writers...\n");
-    if ((fd = open(FIFO_NAME, O_RDONLY)) < 0)
+    if ((f_name_fifo = open(FIFO_NAME, O_RDONLY)) < 0)
     {
-        printf("Error opening named fifo file: %d\n", fd);
+        printf("Error opening named fifo file: %d\n", f_name_fifo);
         exit(1);
     }
 
@@ -56,11 +56,8 @@ int main(void)
     do
     {
         /* read data into local buffer */
-        if ((bytesRead = read(fd, inputBuffer, BUFFER_SIZE)) <= 0)
-        {
-            perror("read");
-        }
-        else
+        bytesRead = read(f_name_fifo, inputBuffer, BUFFER_SIZE);
+        if (bytesRead > 0)
         {
             inputBuffer[bytesRead] = END_STRING;
             printf("reader: %s\n", inputBuffer);

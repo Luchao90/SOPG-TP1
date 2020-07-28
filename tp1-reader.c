@@ -7,12 +7,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <signal.h>
 
 #define FILE_NAME_DATA "Log.txt"
 #define FILE_NAME_SIGN "Sign.txt"
 #define FIFO_NAME "NamedFIFO"
 #define FIFO_ALREADY_EXIST -1
 #define BUFFER_SIZE 300
+#define END_STRING '\0'
 
 int main(void)
 {
@@ -31,6 +33,13 @@ int main(void)
     /* Create or open if exist, for add info in text file */
     f_data = fopen(FILE_NAME_DATA, "a+t");
     f_sign = fopen(FILE_NAME_SIGN, "a+t");
+
+    /* Can't create files */
+    if (f_data == NULL || f_sign == NULL)
+    {
+        printf("Error creating file \n");
+        exit(1);
+    }
 
     /* Open named fifo. Blocks until other process opens it */
     printf("waiting for writers...\n");
@@ -53,7 +62,7 @@ int main(void)
         }
         else
         {
-            inputBuffer[bytesRead] = '\0';
+            inputBuffer[bytesRead] = END_STRING;
             printf("reader: read %d bytes: \"%s\"\n", bytesRead, inputBuffer);
         }
     } while (bytesRead > 0);

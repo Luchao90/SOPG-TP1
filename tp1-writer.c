@@ -11,24 +11,25 @@
 
 #define FIFO_NAME "NamedFIFO"
 #define FIFO_ALREADY_EXIST -1
-#define BUFFER_SIZE 300
+#define BUFFER_SIZE 50
 #define MSG_SIGUSER_1 "SIGN:1\n"
 #define MSG_SIGUSER_2 "SIGN:2\n"
 #define MSG_CRTL_C "CONTROL C\n"
 
 void SigUser_1(int sig);
 void SigUser_2(int sig);
-void Ctrl_C(int sig);
 
 int32_t returnCode, f_name_fifo;
 
 int main(void)
 {
     char outputBuffer[BUFFER_SIZE];
-    uint32_t bytesWrote;
+    char KeyboardBuffer[BUFFER_SIZE];
+
+    /* Map handlers for user signals */
     signal(SIGUSR1, SigUser_1);
     signal(SIGUSR2, SigUser_2);
-    signal(SIGINT, Ctrl_C);
+
     /* Create named fifo. -1 means already exists so no action if already exists */
     if ((returnCode = mknod(FIFO_NAME, S_IFIFO | 0666, 0)) < FIFO_ALREADY_EXIST)
     {
@@ -45,30 +46,22 @@ int main(void)
     }
 
     /* open syscalls returned without error -> other process attached to named fifo */
-    printf("got a reader--type some stuff\n");
+    printf("got a reader--type some stuff\n\n");
 
     /* Loop forever */
     while (1)
     {
         /* Get some text from console */
-        fgets(outputBuffer, BUFFER_SIZE, stdin);
+        fgets(KeyboardBuffer, BUFFER_SIZE, stdin);
+        sprintf(outputBuffer, "DATA:%s", KeyboardBuffer);
 
         /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
-        if ((bytesWrote = write(f_name_fifo, outputBuffer, strlen(outputBuffer) - 1)) == -1)
+        if ((write(f_name_fifo, outputBuffer, strlen(outputBuffer) - 1)) == -1)
         {
             perror("write");
         }
-        else
-        {
-            printf("writer: wrote %d bytes\n", bytesWrote);
-        }
     }
     return 0;
-}
-
-void Ctrl_C(int sig)
-{
-    write(f_name_fifo, MSG_CRTL_C, sizeof(MSG_CRTL_C));
 }
 
 void SigUser_1(int sig)

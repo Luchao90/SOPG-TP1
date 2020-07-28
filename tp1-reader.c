@@ -56,14 +56,14 @@ int main(void)
     do
     {
         /* read data into local buffer */
-        if ((bytesRead = read(fd, inputBuffer, BUFFER_SIZE)) == -1)
+        if ((bytesRead = read(fd, inputBuffer, BUFFER_SIZE)) <= 0)
         {
             perror("read");
         }
         else
         {
             inputBuffer[bytesRead] = END_STRING;
-            printf("reader: read %d bytes: \"%s\"\n", bytesRead, inputBuffer);
+            printf("reader: %s\n", inputBuffer);
         }
     } while (bytesRead > 0);
 

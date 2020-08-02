@@ -23,12 +23,23 @@ int32_t returnCode, f_name_fifo;
 
 int main(void)
 {
-    char outputBuffer[BUFFER_SIZE];
+    char outputBuffer[BUFFER_SIZE + sizeof("DATA:")];
     char KeyboardBuffer[BUFFER_SIZE];
 
+    struct sigaction User1;
+    struct sigaction User2;
+
+    User1.sa_handler = SigUser_1;
+    User1.sa_flags = SA_RESTART;
+    sigemptyset(&User1.sa_mask);
+
+    User2.sa_handler = SigUser_2;
+    User2.sa_flags = SA_RESTART;
+    sigemptyset(&User2.sa_mask);
+
     /* Map handlers for user signals */
-    signal(SIGUSR1, SigUser_1);
-    signal(SIGUSR2, SigUser_2);
+    sigaction(SIGUSR1, &User1, NULL);
+    sigaction(SIGUSR2, &User2, NULL);
 
     /* Create named fifo. -1 means already exists so no action if already exists */
     if ((returnCode = mknod(FIFO_NAME, S_IFIFO | 0666, 0)) < FIFO_ALREADY_EXIST)
@@ -61,6 +72,9 @@ int main(void)
             perror("write");
         }
     }
+
+    /* Close named fifo. */
+    close(f_name_fifo);
     return 0;
 }
 

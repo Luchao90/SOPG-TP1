@@ -19,10 +19,9 @@
 
 int main(void)
 {
-    uint8_t inputBuffer[BUFFER_SIZE];
+    char inputBuffer[BUFFER_SIZE];
     int32_t bytesRead, returnCode, f_name_fifo;
     FILE *f_data, *f_sign;
-    char character;
     char Input_Type[INPUT_TYPE_LENGTH];
 
     /* Create named fifo. -1 means already exists so no action if already exists */
@@ -79,6 +78,9 @@ int main(void)
     /* Close files */
     fclose(f_data);
     fclose(f_sign);
+
+    /* Close named fifo. */
+    close(f_name_fifo);
 
     return 0;
 }

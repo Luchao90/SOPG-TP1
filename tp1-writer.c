@@ -63,13 +63,15 @@ int main(void)
     while (1)
     {
         /* Get some text from console */
-        fgets(KeyboardBuffer, BUFFER_SIZE, stdin);
-        sprintf(outputBuffer, "DATA:%s", KeyboardBuffer);
-
-        /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
-        if ((write(f_name_fifo, outputBuffer, strlen(outputBuffer) - 1)) == -1)
+        if (NULL != fgets(KeyboardBuffer, BUFFER_SIZE, stdin))
         {
-            perror("write");
+            sprintf(outputBuffer, "DATA:%s", KeyboardBuffer);
+
+            /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
+            if ((write(f_name_fifo, outputBuffer, strlen(outputBuffer) - 1)) == -1)
+            {
+                perror("write");
+            }
         }
     }
 
